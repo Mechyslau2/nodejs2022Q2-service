@@ -7,3 +7,8 @@ export class ErrorHandler {
     this.code = code;
   }
 }
+
+export interface Error {
+  code: number;
+  message: string;
+}

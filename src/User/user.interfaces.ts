@@ -16,8 +16,3 @@ export interface User {
   createdAt: number;
   updatedAt: number;
 }
-
-export interface Error {
-  code: number;
-  message: string;
-}

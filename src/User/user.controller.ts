@@ -9,13 +9,9 @@ import {
   Res,
 } from '@nestjs/common';
 import { Response } from 'express';
-import {
-  CreateUserDto,
-  UpdatePasswordDto,
-  User,
-  Error,
-} from './user.interfaces';
+import { CreateUserDto, UpdatePasswordDto, User } from './user.interfaces';
 import { UserService } from './user.service';
+import { Error } from '../errors/ErrorHandler';
 
 @Controller('user')
 export class UserController {
@@ -39,8 +35,13 @@ export class UserController {
   }
 
   @Post()
-  createUser(@Body() loginDto: CreateUserDto) {
-    return this.userService.createUser(loginDto);
+  createUser(@Body() loginDto: CreateUserDto, @Res() response: Response) {
+    const user = this.userService.createUser(loginDto);
+    if (this.checkTypeofError(user) && user?.code) {
+      return response.status(user.code).send(user.message);
+    } else {
+      return response.send(user);
+    }
   }
 
   @Put('/:id')
