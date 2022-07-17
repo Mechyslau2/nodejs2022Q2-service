@@ -40,7 +40,7 @@ export class UserController {
     if (this.checkTypeofError(user) && user?.code) {
       return response.status(user.code).send(user.message);
     } else {
-      return response.send(user);
+      return response.status(201).send(user);
     }
   }
 

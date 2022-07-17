@@ -1,7 +1,16 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  Res,
+} from '@nestjs/common';
 import { TrackService } from './track.service';
 
-import { response, Response } from 'express';
+import { Response } from 'express';
 import { Error } from 'src/errors/ErrorHandler';
 import { Track } from './track.interfaces';
 
@@ -38,7 +47,7 @@ export class TrackController {
         .status(recivedTrackData.code)
         .send(recivedTrackData.message);
     } else {
-      return response.send(recivedTrackData);
+      return response.status(201).send(recivedTrackData);
     }
   }
 
@@ -62,7 +71,7 @@ export class TrackController {
         .status(recivedTrackData.code)
         .send(recivedTrackData.message);
     } else {
-      return response.send(recivedTrackData);
+      return response.status(201).send(recivedTrackData);
     }
   }
 }

@@ -6,10 +6,10 @@ import { ErrorHandler } from 'src/errors/ErrorHandler';
 
 @Injectable()
 export class UserService {
-  private _user: UserModule;
+  private userModule: UserModule;
 
   constructor() {
-    this._user = new UserModule();
+    this.userModule = new UserModule();
   }
 
   private checkId(id: string): boolean {
@@ -23,7 +23,7 @@ export class UserService {
         message: "it ins't valid id",
       });
     }
-    const user = this._user.getUserById(id);
+    const user = this.userModule.getUserById(id);
     if (!user) {
       return new ErrorHandler({
         code: 404,
@@ -34,7 +34,7 @@ export class UserService {
   }
 
   getAllUsers(): User[] {
-    return this._user.getUsers();
+    return this.userModule.getUsers();
   }
 
   updatePasswordDto(id: string, data: UpdatePasswordDto) {
@@ -44,7 +44,7 @@ export class UserService {
         message: 'Should fill all required fields',
       });
     }
-    return this._user.updateUser(id, data);
+    return this.userModule.updateUser(id, data);
   }
 
   createUser(data: CreateUserDto) {
@@ -54,7 +54,7 @@ export class UserService {
         message: 'Should fill all required fields',
       });
     }
-    return this._user.addUser(data);
+    return this.userModule.addUser(data);
   }
 
   deleteUser(id: string) {
@@ -64,7 +64,7 @@ export class UserService {
         message: "it ins't valid id",
       });
     }
-    const data = this._user.deleteUser(id);
+    const data = this.userModule.deleteUser(id);
     if (!data) {
       return new ErrorHandler({
         code: 404,

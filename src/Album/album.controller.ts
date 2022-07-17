@@ -43,7 +43,7 @@ export class AlbumController {
     if (this.checkTypeofError(album) && album?.code) {
       return response.status(album.code).send(album.message);
     } else {
-      return response.send(album);
+      return response.status(201).send(album);
     }
   }
 

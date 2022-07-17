@@ -41,7 +41,7 @@ export class ArtistController {
     if (this.checkTypeofError(artist) && artist?.code) {
       return response.status(artist.code).send(artist.message);
     } else {
-      return response.send(artist);
+      return response.status(201).send(artist);
     }
   }
 
