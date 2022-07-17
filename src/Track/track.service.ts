@@ -39,12 +39,7 @@ export class TrackService {
   }
 
   createTrack(data: TrackCreator): Track | Error {
-    if (
-      !data?.albumId ||
-      !data?.artistId ||
-      !Number(data?.duration) ||
-      !data?.name?.trim()
-    ) {
+    if (!Number(data?.duration) || !data?.name?.trim()) {
       return new ErrorHandler({
         code: 400,
         message: 'All fields are required',
@@ -55,6 +50,16 @@ export class TrackService {
   }
 
   updateTrack(id: string, trackData: Track): Track | Error {
+    if (
+      typeof trackData?.name !== 'string' ||
+      !trackData?.name?.trim() ||
+      typeof trackData?.duration !== 'number'
+    ) {
+      return new ErrorHandler({
+        code: 400,
+        message: 'All fields are required',
+      });
+    }
     if (!this.checkId(id)) {
       return new ErrorHandler({
         code: 400,

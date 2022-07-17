@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { UserModule } from './user.module';
 import { validate, version } from 'uuid';
-import { CreateUserDto, UpdatePasswordDto, User } from './user.interfaces';
+import { CreateUserDto, UpdatePasswordDto, User, UserToSend } from './user.interfaces';
 import { ErrorHandler } from 'src/errors/ErrorHandler';
 
 @Injectable()
@@ -16,7 +16,7 @@ export class UserService {
     return validate(id) && version(id) === 4;
   }
 
-  getUserById(id: string): User | ErrorHandler {
+  getUserById(id: string): UserToSend | ErrorHandler {
     if (!this.checkId(id)) {
       return new ErrorHandler({
         code: 400,
@@ -38,13 +38,33 @@ export class UserService {
   }
 
   updatePasswordDto(id: string, data: UpdatePasswordDto) {
-    if (!data?.newPassword?.trim() || !data?.oldPassowrd?.trim()) {
+    if(!this.checkId(id)) {
+      return new ErrorHandler({
+        code: 400,
+        message: "it ins't valid id",
+      });
+    }
+    if (!data?.newPassword?.trim() || !data?.oldPassword?.trim()) {
       return new ErrorHandler({
         code: 400,
         message: 'Should fill all required fields',
       });
     }
-    return this.userModule.updateUser(id, data);
+    const password = this.userModule.getUserPasswordById(id);
+    if (!password) {
+      return new ErrorHandler({
+        code: 404,
+        message: 'User not found',
+      });
+    }
+    if (password !== data?.oldPassword) {
+      return new ErrorHandler({
+        code: 403,
+        message: 'Old password is wrong',
+      });
+    }
+    const user = this.userModule.updateUser(id, data);
+    return user;
   }
 
   createUser(data: CreateUserDto) {

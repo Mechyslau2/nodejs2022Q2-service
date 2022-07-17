@@ -37,6 +37,16 @@ export class AlbumService {
   }
 
   updateAlbum(id: string, albumData: Album): Album | Error {
+    if (
+      typeof albumData?.name !== 'string' ||
+      !albumData?.name?.trim() ||
+      !Number(albumData?.year)
+    ) {
+      return new ErrorHandler({
+        code: 400,
+        message: 'All fields are required',
+      });
+    }
     if (!this.checkId(id)) {
       return new ErrorHandler({
         code: 400,
@@ -54,7 +64,7 @@ export class AlbumService {
   }
 
   createAlbum(data: AlbumCreator): Album | Error {
-    if (!data?.name?.trim() || !data?.artistId || !Number(data?.year)) {
+    if (!data?.name?.trim() || !Number(data?.year)) {
       return new ErrorHandler({
         code: 400,
         message: 'All fields are required',

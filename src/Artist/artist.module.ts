@@ -4,7 +4,7 @@ import { ArtistService } from './artist.service';
 
 import { v4 as uuidv4 } from 'uuid';
 import { Artist, CreatorArtist } from './artist.interfaces';
-import { artistDB } from '../db/mockedDB';
+import { artistDB, trackDB } from '../db/mockedDB';
 
 @Module({
   controllers: [ArtistController],
@@ -26,21 +26,30 @@ export class ArtistModule {
     return artist;
   }
 
-  udpateArtist(id: string, data: Artist): Artist {
+  udpateArtist(id: string, data: CreatorArtist): Artist | null {
     const artist = artistDB.find((artist) => artist.id === id);
-    const index = artistDB.findIndex((artist) => artist.id === id);
-    const updatedData = {
-      ...artist,
-      ...data,
-    };
-    artistDB[index] = updatedData;
-    return updatedData;
+    if (artist) {
+      const index = artistDB.findIndex((artist) => artist.id === id);
+      const updatedData = {
+        ...artist,
+        ...data,
+      };
+      artistDB[index] = updatedData;
+      return updatedData;
+    }
+    return null;
   }
 
   deleteArtist(id: string): boolean {
     const artistInd = artistDB.findIndex((artist) => artist.id === id);
     if (artistInd >= 0) {
       artistDB.splice(artistInd, 1);
+      const trackInd = trackDB.findIndex((track) => track.artistId === id);
+      if (trackInd >= 0) {
+        trackDB[trackInd].artistId = null;
+        trackDB[trackInd].albumId = null;
+      }
+
       return true;
     }
     return false;

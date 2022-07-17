@@ -45,6 +45,7 @@ export class FavoritesService {
       });
     }
     const isDeletedTrack = this.favoritesModule.deleteFavoritesTrack(id);
+
     if (!isDeletedTrack) {
       return new ErrorHandler({
         code: 404,

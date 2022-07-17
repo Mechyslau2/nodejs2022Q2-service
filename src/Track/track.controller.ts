@@ -71,7 +71,7 @@ export class TrackController {
         .status(recivedTrackData.code)
         .send(recivedTrackData.message);
     } else {
-      return response.status(201).send(recivedTrackData);
+      return response.status(204).send(recivedTrackData);
     }
   }
 }

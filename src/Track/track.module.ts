@@ -23,18 +23,26 @@ export class TrackModule {
   createTrack(data: TrackCreator): Track {
     const track = { ...data } as Track;
     track.id = uuidv4();
+    if (!data?.albumId || !data?.artistId) {
+      track.albumId = null;
+      track.artistId = null;
+    }
+    trackDB.push(track);
     return track;
   }
 
-  updateTrack(id: string, trackData: Track): Track {
+  updateTrack(id: string, trackData: Track): Track | null {
     const data = trackDB.find((track) => track.id === id);
-    const index = trackDB.findIndex((track) => track.id === id);
-    const updatedData = {
-      ...data,
-      ...trackData,
-    };
-    trackDB[index] = updatedData;
-    return updatedData;
+    if (data) {
+      const index = trackDB.findIndex((track) => track.id === id);
+      const updatedData = {
+        ...data,
+        ...trackData,
+      };
+      trackDB[index] = updatedData;
+      return updatedData;
+    }
+    return null;
   }
 
   deleteTrack(id: string): boolean {
