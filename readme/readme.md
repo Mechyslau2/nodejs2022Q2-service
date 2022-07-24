@@ -39,3 +39,20 @@
 }
 `
 
+# Запуск через Docker
+
+***Если Вы меняли порт при установке postgresql***
+
+Порт можно поменять в .env. Переменная - POSTGRES_PORT
+
+***Важно!*** 
+Убедиться что запущен docker-desktop)
+
+## Запуск без наблюдения изменений 
+
+`yarn docker:start` or `npm run docker:start`
+
+## Запуск с наблюдениями
+
+`yarn docker:build` or `npm run docker:build`
+
