@@ -3,9 +3,9 @@ import { FavoritesController } from './favorites.controller';
 import { FavoritesService } from './favorites.service';
 
 import { albumDB, artistDB, favoritiesDB, trackDB } from 'src/db/mockedDB';
-import { Track } from 'src/track/track.interfaces';
-import { Album } from 'src/album/album.interface';
-import { Artist } from 'src/artist/artist.interfaces';
+import { Track } from 'src/Track/track.interfaces';
+import { Album } from 'src/Album/album.interface';
+import { Artist } from 'src/Artist/artist.interfaces';
 
 @Module({
   controllers: [FavoritesController],
