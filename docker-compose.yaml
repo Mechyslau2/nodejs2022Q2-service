@@ -1,0 +1,8 @@
+version: "3.0"
+
+services:
+    simple-rest-server_rss:
+      image: simple-rest-api
+      build: .
+      ports:
+      - "${PORT}:${PORT}"

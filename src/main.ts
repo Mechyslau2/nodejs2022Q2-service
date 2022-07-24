@@ -3,8 +3,11 @@ import { AppModule } from './app.module';
 import { SwaggerModule } from '@nestjs/swagger';
 import { parse } from 'yaml';
 import { cwd as getRootPath } from 'node:process';
+import 'dotenv/config';
 
 import { readFile } from 'fs/promises';
+
+const PORT = process.env.PORT || 4000;
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -15,6 +18,8 @@ async function bootstrap() {
 
   SwaggerModule.setup('swagger', app, swaggerDocument);
 
-  await app.listen(4000);
+  await app
+    .listen(PORT)
+    .then(() => console.log(`App is running on port: ${PORT}`));
 }
 bootstrap();
