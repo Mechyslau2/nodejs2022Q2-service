@@ -1,4 +1,4 @@
-## Установка
+# Установка
 
 `yarn install` or `npm install`
 
@@ -39,3 +39,45 @@
 }
 `
 
+# Запуск через Docker
+
+***Переименовать .env.example в .env***
+
+Добавить свои креды postgresql в переменные (user, password, db) 
+
+***Если Вы меняли порт при установке postgresql***
+
+Порт можно поменять в .env. Переменная - POSTGRES_PORT
+
+***Важно!*** 
+Убедиться что запущен docker-desktop)
+
+## Запуск без наблюдения изменений 
+
+`yarn docker:start` or `npm run docker:start`
+
+## Остановка docker
+
+`yarn docker:stop` or `npm run docker:stop`
+
+## Перезапись docker и запуск с изминениями в src
+
+Проверить можно через postman. Например именить код ответа.
+
+`yarn docker:restart` or `npm run docker:restart`
+
+## Создание образа для пуша в dockerHub
+
+Пушить ничего не нужно)
+
+`yarn docker:build` or `npm run docker:build`
+
+## Сканирование на уязвимости
+
+Отсканировать можно после команды ***docker:build***
+
+`yarn docker:check` or `npm run docker:check`
+
+## Удаление всех неактивных образов
+
+`yarn docker:di` or `npm run docker:di`

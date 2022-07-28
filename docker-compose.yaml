@@ -1,0 +1,42 @@
+version: "3.8"
+
+services:
+  rest-server:
+    container_name: server 
+    build: .
+    environment:
+      DATABASE_URL: postgres://${DB_USER}:${DB_PASSWORD}@postgres:${POSTGRES_PORT}/${DB_POSTGRES}?shema=public
+    env_file:
+    - .env
+    volumes:
+    - .:/src
+    ports:
+    - ${PORT}:${PORT}
+    command: npm run start:dev
+    restart: always
+    depends_on: 
+    - postgres
+
+  postgres:
+    container_name: postgres_db
+    image: postgres:14.4-alpine
+    networks:
+      - db-connect
+    env_file:
+    - .env  
+    environment:
+    -  PG_DATA=/var/lib/postgresql/data
+    -  POSTGRES_DB=${DB_POSTGRES}
+    -  POSTGRES_USER=${DB_USER}
+    -  POSTGRES_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - ../2. Init Database:/docker-entrypoint-initdb.d
+      - data:/var/lib/postgresql/data
+    ports:
+    - ${POSTGRES_PORT}:${POSTGRES_PORT}
+    restart: always
+volumes:
+    data:    
+networks:
+  db-connect:
+    driver: bridge
