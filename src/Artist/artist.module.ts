@@ -5,53 +5,73 @@ import { ArtistService } from './artist.service';
 import { v4 as uuidv4 } from 'uuid';
 import { Artist, CreatorArtist } from './artist.interfaces';
 import { artistDB, trackDB } from '../db/mockedDB';
+import { Artists } from './artist.entity';
+import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Observable, from } from 'rxjs';
+import { Tracks } from 'src/Track/track.entity';
+import { Track } from 'src/Track/track.interfaces';
 
 @Module({
+  imports: [
+    TypeOrmModule.forFeature([Artists]),
+    TypeOrmModule.forFeature([Tracks]),
+  ],
   controllers: [ArtistController],
   providers: [ArtistService],
 })
 export class ArtistModule {
-  getAllArtists() {
-    return artistDB;
+  constructor(
+    @InjectRepository(Artists) private artistsRepository: Repository<Artist>,
+    @InjectRepository(Tracks) private tracksRepository: Repository<Track>,
+  ) {}
+
+  getAllArtists(): Observable<Artist[]> {
+    return from(this.artistsRepository.find());
   }
 
-  getArtistById(id: string): Artist {
-    return artistDB.find((artist) => artist.id === id);
+  async getArtistById(id: string): Promise<Artist> {
+    return await this.artistsRepository.findOneBy({ id });
   }
 
-  addArtist(data: CreatorArtist): Artist {
-    const artist = { ...data } as Artist;
-    artist.id = uuidv4();
-    artistDB.push(artist);
-    return artist;
+  async addArtist(artist: CreatorArtist): Promise<Artist> {
+    return await this.artistsRepository.save(artist);
   }
 
-  udpateArtist(id: string, data: CreatorArtist): Artist | null {
-    const artist = artistDB.find((artist) => artist.id === id);
+  async udpateArtist(id: string, data: CreatorArtist): Promise<Artist | null> {
+    const artist = await this.artistsRepository.findOneBy({ id });
     if (artist) {
-      const index = artistDB.findIndex((artist) => artist.id === id);
-      const updatedData = {
+      const updatedArtistData = {
         ...artist,
         ...data,
       };
-      artistDB[index] = updatedData;
-      return updatedData;
+      return await this.artistsRepository.save({
+        id,
+        ...updatedArtistData,
+      });
     }
     return null;
   }
 
-  deleteArtist(id: string): boolean {
-    const artistInd = artistDB.findIndex((artist) => artist.id === id);
-    if (artistInd >= 0) {
-      artistDB.splice(artistInd, 1);
-      const trackInd = trackDB.findIndex((track) => track.artistId === id);
-      if (trackInd >= 0) {
-        trackDB[trackInd].artistId = null;
-        trackDB[trackInd].albumId = null;
-      }
-
-      return true;
+  async deleteArtist(id: string): Promise<boolean> {
+    const artist = await this.artistsRepository.findOneBy({ id });
+    if (!artist) return false;
+    const isArtistDeleted = await !!this.artistsRepository
+      .createQueryBuilder()
+      .delete()
+      .where({ id })
+      .execute();
+    try {
+      const track = await this.tracksRepository.findOneBy({ artistId: id });
+      this.tracksRepository.save({
+        id: track.id,
+        ...track,
+        artistId: null,
+        albumId: null,
+      });
+    } catch (error) {
+      console.log(error);
     }
-    return false;
+    return isArtistDeleted;
   }
 }

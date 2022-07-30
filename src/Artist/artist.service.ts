@@ -1,4 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { Observable } from 'rxjs';
 import { ErrorHandler, Error } from 'src/errors/ErrorHandler';
 import { validate, version } from 'uuid';
 import { Artist, CreatorArtist } from './artist.interfaces';
@@ -6,28 +7,26 @@ import { ArtistModule } from './artist.module';
 
 @Injectable()
 export class ArtistService {
-  private artistModule: ArtistModule;
-
-  constructor() {
-    this.artistModule = new ArtistModule();
-  }
+  constructor(
+    @Inject(forwardRef(() => ArtistModule)) private artistModule: ArtistModule,
+  ) {}
 
   private checkId(id: string): boolean {
     return validate(id) && version(id) === 4;
   }
 
-  getAllArtists() {
+  getAllArtists(): Observable<Artist[]> {
     return this.artistModule.getAllArtists();
   }
 
-  getArtistById(id: string): Artist | Error {
+  async getArtistById(id: string): Promise<Artist | Error> {
     if (!this.checkId(id)) {
       return new ErrorHandler({
         code: 400,
         message: "It isn't valid id",
       });
     }
-    const artist = this.artistModule.getArtistById(id);
+    const artist = await this.artistModule.getArtistById(id);
     if (!artist) {
       return new ErrorHandler({
         code: 404,
@@ -37,7 +36,7 @@ export class ArtistService {
     return artist;
   }
 
-  createArtist(data: CreatorArtist): Artist | Error {
+  async createArtist(data: CreatorArtist): Promise<Artist | Error> {
     if (
       !data.hasOwnProperty('grammy') ||
       typeof data?.grammy !== 'boolean' ||
@@ -48,11 +47,10 @@ export class ArtistService {
         message: 'All fields are required',
       });
     }
-    const artist = this.artistModule.addArtist(data);
-    return artist;
+    return await this.artistModule.addArtist(data);
   }
 
-  updateArtist(id: string, data: CreatorArtist): Artist | Error {
+  async updateArtist(id: string, data: CreatorArtist): Promise<Artist | Error> {
     if (!this.checkId(id)) {
       return new ErrorHandler({
         code: 400,
@@ -70,7 +68,7 @@ export class ArtistService {
         message: 'All fields are required',
       });
     }
-    const artist = this.artistModule.udpateArtist(id, data);
+    const artist = await this.artistModule.udpateArtist(id, data);
     if (!artist) {
       return new ErrorHandler({
         code: 404,
@@ -80,15 +78,15 @@ export class ArtistService {
     return artist;
   }
 
-  deleteArtist(id: string) {
+  async deleteArtist(id: string): Promise<void | Error> {
     if (!this.checkId(id)) {
       return new ErrorHandler({
         code: 400,
         message: "it ins't valid id",
       });
     }
-    const data = this.artistModule.deleteArtist(id);
-    if (!data) {
+    const isArtistDeleted = await this.artistModule.deleteArtist(id);
+    if (!isArtistDeleted) {
       return new ErrorHandler({
         code: 404,
         message: 'Artist not found',

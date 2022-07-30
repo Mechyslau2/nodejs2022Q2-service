@@ -1,8 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AlbumService } from './album.service';
-import { v4 as uuidv4 } from 'uuid';
 
-import { albumDB, artistDB } from 'src/db/mockedDB';
 import { Album, AlbumCreator } from './album.interface';
 import { AlbumController } from './album.controller';
 import { Albums } from './album.entity';

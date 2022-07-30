@@ -1,11 +1,15 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
-export class Artists {
+export class Tracks {
   @PrimaryGeneratedColumn('uuid')
   id: string;
   @Column()
   name: string;
   @Column()
-  grammy: boolean;
+  artistId: string | null;
+  @Column()
+  albumId: string | null;
+  @Column()
+  duration: number;
 }
