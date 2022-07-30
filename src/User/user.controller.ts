@@ -9,7 +9,12 @@ import {
   Res,
 } from '@nestjs/common';
 import { Response } from 'express';
-import { CreateUserDto, UpdatePasswordDto, User } from './user.interfaces';
+import {
+  CreateUserDto,
+  UpdatePasswordDto,
+  User,
+  UserToSend,
+} from './user.interfaces';
 import { UserService } from './user.service';
 import { Error } from '../errors/ErrorHandler';
 import { Observable } from 'rxjs';
@@ -21,9 +26,13 @@ export class UserController {
   private checkTypeofError(obj: any): obj is Error {
     return !!(<Error>obj);
   }
+
   @Get('/:id')
-  getUserById(@Param() { id }, @Res() response: Response) {
-    const data = this.userService.getUserById(id);
+  async getUserById(
+    @Param() { id },
+    @Res() response: Response,
+  ): Promise<UserToSend | Response> {
+    const data = await this.userService.getUserById(id);
     if (this.checkTypeofError(data) && data?.code) {
       return response.status(data.code).send(data.message);
     } else {
@@ -31,13 +40,16 @@ export class UserController {
     }
   }
   @Get()
-  getAllUsers(): Observable<User[]> {
+  getAllUsers(): Observable<UserToSend[]> {
     return this.userService.getAllUsers();
   }
 
   @Post()
-  createUser(@Body() loginDto: CreateUserDto, @Res() response: Response) {
-    const user = this.userService.createUser(loginDto);
+  async createUser(
+    @Body() loginDto: CreateUserDto,
+    @Res() response: Response,
+  ): Promise<UserToSend | Response> {
+    const user = await this.userService.createUser(loginDto);
     if (this.checkTypeofError(user) && user?.code) {
       return response.status(user.code).send(user.message);
     } else {
@@ -46,14 +58,14 @@ export class UserController {
   }
 
   @Put('/:id')
-  updateUserPassword(
+  async updateUserPassword(
     @Body()
     requestData: UpdatePasswordDto,
     @Param()
     { id },
     @Res() response: Response,
-  ) {
-    const data = this.userService.updatePasswordDto(id, requestData);
+  ): Promise<UserToSend | Response> {
+    const data = await this.userService.updatePasswordDto(id, requestData);
     if (this.checkTypeofError(data) && data?.code) {
       return response.status(data.code).send(data.message);
     } else {
@@ -62,8 +74,11 @@ export class UserController {
   }
 
   @Delete('/:id')
-  deleteUser(@Param() { id }, @Res() response: Response) {
-    const data = this.userService.deleteUser(id);
+  async deleteUser(
+    @Param() { id },
+    @Res() response: Response,
+  ): Promise<void | Response> {
+    const data = await this.userService.deleteUser(id);
     if (this.checkTypeofError(data) && data?.code) {
       return response.status(data.code).send(data.message);
     } else {

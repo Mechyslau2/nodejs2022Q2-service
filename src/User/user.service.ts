@@ -20,14 +20,14 @@ export class UserService {
     return validate(id) && version(id) === 4;
   }
 
-  getUserById(id: string): UserToSend | ErrorHandler {
+  async getUserById(id: string): Promise<UserToSend | ErrorHandler> {
     if (!this.checkId(id)) {
       return new ErrorHandler({
         code: 400,
         message: "it ins't valid id",
       });
     }
-    const user = this.userModule.getUserById(id);
+    const user = await this.userModule.getUserById(id);
     if (!user) {
       return new ErrorHandler({
         code: 404,
@@ -37,11 +37,14 @@ export class UserService {
     return user;
   }
 
-  getAllUsers(): Observable<User[]> {
+  getAllUsers(): Observable<UserToSend[]> {
     return this.userModule.getUsers();
   }
 
-  updatePasswordDto(id: string, data: UpdatePasswordDto) {
+  async updatePasswordDto(
+    id: string,
+    data: UpdatePasswordDto,
+  ): Promise<UserToSend | ErrorHandler> {
     if (!this.checkId(id)) {
       return new ErrorHandler({
         code: 400,
@@ -54,41 +57,42 @@ export class UserService {
         message: 'Should fill all required fields',
       });
     }
-    const password = this.userModule.getUserPasswordById(id);
-    if (!password) {
+    const userData = await this.userModule.getUserPasswordById(id);
+
+    if (!userData?.password) {
       return new ErrorHandler({
         code: 404,
         message: 'User not found',
       });
     }
-    if (password !== data?.oldPassword) {
+    if (userData?.password !== data?.oldPassword) {
       return new ErrorHandler({
         code: 403,
         message: 'Old password is wrong',
       });
     }
-    const user = this.userModule.updateUser(id, data);
+    const user = await this.userModule.updateUser(id, data);
     return user;
   }
 
-  createUser(data: CreateUserDto) {
+  async createUser(data: CreateUserDto): Promise<UserToSend | ErrorHandler> {
     if (!data?.login?.trim() || !data?.password?.trim()) {
       return new ErrorHandler({
         code: 404,
         message: 'Should fill all required fields',
       });
     }
-    return this.userModule.addUser(data);
+    return await this.userModule.addUser(data);
   }
 
-  deleteUser(id: string) {
+  async deleteUser(id: string): Promise<ErrorHandler | void> {
     if (!this.checkId(id)) {
       return new ErrorHandler({
         code: 400,
         message: "it ins't valid id",
       });
     }
-    const data = this.userModule.deleteUser(id);
+    const data = await this.userModule.deleteUser(id);
     if (!data) {
       return new ErrorHandler({
         code: 404,
