@@ -4,10 +4,10 @@ services:
   rest-server:
     container_name: server 
     build: .
-    environment:
-      DATABASE_URL: postgres://${DB_USER}:${DB_PASSWORD}@postgres:${POSTGRES_PORT}/${DB_POSTGRES}?shema=public
     env_file:
     - .env
+    networks:
+      - db-connect
     volumes:
     - .:/src
     ports:

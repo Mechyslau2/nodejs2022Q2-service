@@ -12,6 +12,7 @@ import { Response } from 'express';
 import { CreateUserDto, UpdatePasswordDto, User } from './user.interfaces';
 import { UserService } from './user.service';
 import { Error } from '../errors/ErrorHandler';
+import { Observable } from 'rxjs';
 
 @Controller('user')
 export class UserController {
@@ -30,7 +31,7 @@ export class UserController {
     }
   }
   @Get()
-  getAllUsers(): User[] {
+  getAllUsers(): Observable<User[]> {
     return this.userService.getAllUsers();
   }
 

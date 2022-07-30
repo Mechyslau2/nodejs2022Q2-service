@@ -10,14 +10,21 @@ import {
   UpdatePasswordDto,
   UserToSend,
 } from './user.interfaces';
+import { Users } from './user.entity';
+import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { from, Observable } from 'rxjs';
 
 @Module({
+  imports: [TypeOrmModule.forFeature([Users])],
   controllers: [UserController],
   providers: [UserService],
 })
 export class UserModule {
   private passwords = [] as User[];
-  constructor() {
+  constructor(
+    @InjectRepository(Users) private userRepository: Repository<User>,
+  ) {
     this.passwords = [];
   }
 
@@ -26,19 +33,20 @@ export class UserModule {
     return user ? user.password : null;
   }
 
-  private createUser(data: CreateUserDto): UserToSend {
-    const user = {} as UserToSend;
+  private createUser(data: CreateUserDto): User {
+    const user = {} as User;
     user.login = data.login;
-    user.id = uuidv4();
+    user.password = data.password;
     user.version = 1;
     user.createdAt = user.updatedAt = new Date().getTime();
+    console.log(typeof Date.now())
     this.passwords.push({ ...data, ...user });
     return user;
   }
-  addUser(user: CreateUserDto): UserToSend {
+  addUser(user: CreateUserDto): Observable<UserToSend> {
     const userData = this.createUser(user);
-    userDB.push(userData);
-    return userData;
+    console.log(userData);
+    return from(this.userRepository.save(userData));
   }
 
   getUserById(id: string): UserToSend {
@@ -46,8 +54,8 @@ export class UserModule {
     return user;
   }
 
-  getUsers(): User[] {
-    return userDB;
+  getUsers(): Observable<User[]> {
+    return from(this.userRepository.find());
   }
 
   updateUser(id: string, dataDto: UpdatePasswordDto) {

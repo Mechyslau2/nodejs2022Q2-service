@@ -1,16 +1,20 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { UserModule } from './user.module';
 import { validate, version } from 'uuid';
-import { CreateUserDto, UpdatePasswordDto, User, UserToSend } from './user.interfaces';
+import {
+  CreateUserDto,
+  UpdatePasswordDto,
+  User,
+  UserToSend,
+} from './user.interfaces';
 import { ErrorHandler } from 'src/errors/ErrorHandler';
+import { Observable } from 'rxjs';
 
 @Injectable()
 export class UserService {
-  private userModule: UserModule;
-
-  constructor() {
-    this.userModule = new UserModule();
-  }
+  constructor(
+    @Inject(forwardRef(() => UserModule)) private userModule: UserModule,
+  ) {}
 
   private checkId(id: string): boolean {
     return validate(id) && version(id) === 4;
@@ -33,12 +37,12 @@ export class UserService {
     return user;
   }
 
-  getAllUsers(): User[] {
+  getAllUsers(): Observable<User[]> {
     return this.userModule.getUsers();
   }
 
   updatePasswordDto(id: string, data: UpdatePasswordDto) {
-    if(!this.checkId(id)) {
+    if (!this.checkId(id)) {
       return new ErrorHandler({
         code: 400,
         message: "it ins't valid id",

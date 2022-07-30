@@ -6,9 +6,19 @@ import { ArtistModule } from './Artist/artist.module';
 import { TrackModule } from './Track/track.module';
 import { FavoritesModule } from './Favorites/favorites.module';
 import { AlbumModule } from './Album/album.module';
-
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule } from '@nestjs/config';
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      url: process.env.DATABASE_URL,
+      autoLoadEntities: true,
+      synchronize: true,
+    }),
     UserModule,
     ArtistModule,
     TrackModule,
