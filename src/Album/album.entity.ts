@@ -1,22 +1,13 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
-export class Users {
+export class Albums {
   @PrimaryGeneratedColumn('uuid')
   id: string;
-
   @Column()
-  login: string;
-
+  name: string;
   @Column()
-  password: string;
-
+  year: number;
   @Column()
-  version: number;
-
-  @Column()
-  createdAt: string;
-
-  @Column()
-  updatedAt: string;
+  artistId: string | null;
 }

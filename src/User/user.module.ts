@@ -90,7 +90,6 @@ export class UserModule {
 
   async deleteUser(userId: string): Promise<boolean> {
     const user = await this.userRepository.findOneBy({ id: userId });
-    console.log(user);
     if (!user) return false;
     return await !!this.userRepository
       .createQueryBuilder()

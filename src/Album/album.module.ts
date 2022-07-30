@@ -5,56 +5,72 @@ import { v4 as uuidv4 } from 'uuid';
 import { albumDB, artistDB } from 'src/db/mockedDB';
 import { Album, AlbumCreator } from './album.interface';
 import { AlbumController } from './album.controller';
+import { Albums } from './album.entity';
+import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Observable, from } from 'rxjs';
+import { Artists } from 'src/Artist/artist.entity';
+import { Artist } from 'src/Artist/artist.interfaces';
 
 @Module({
+  imports: [
+    TypeOrmModule.forFeature([Albums]),
+    TypeOrmModule.forFeature([Artists]),
+  ],
   controllers: [AlbumController],
   providers: [AlbumService],
 })
 export class AlbumModule {
-  getAllAlbums() {
-    return albumDB;
+  constructor(
+    @InjectRepository(Albums) private albumsRepository: Repository<Album>,
+    @InjectRepository(Artists) private artistsRepository: Repository<Artist>,
+  ) {}
+
+  getAllAlbums(): Observable<Album[]> {
+    return from(this.albumsRepository.find());
   }
 
-  getAlbumById(id: string): Album {
-    const album = albumDB.find((album) => album.id === id);
+  async getAlbumById(id: string): Promise<Album> {
+    const album = await this.albumsRepository.findOneBy({ id });
     return album;
   }
 
-  addAlbum(data: AlbumCreator): Album {
-    const albumData = { ...data } as Album;
-    albumData.id = uuidv4();
-    if (!data?.artistId) {
-      albumData.artistId = null;
-    } else {
-      albumData.artistId = data.artistId;
-    }
-    albumDB.push(albumData);
-    return albumData;
+  async addAlbum(album: AlbumCreator): Promise<Album> {
+    return await this.albumsRepository.save(album);
   }
 
-  updateAlbum(id: string, data: Album): Album | null {
-    const album = albumDB.find((album) => album.id === id);
+  async updateAlbum(id: string, data: Album): Promise<Album | null> {
+    const album = await this.albumsRepository.findOneBy({ id });
     if (album) {
-      const index = albumDB.findIndex((album) => album.id === id);
-      const updatedData = {
+      const updatedAlbum = {
         ...album,
         ...data,
       };
-      albumDB[index] = updatedData;
-      return updatedData;
+      return await this.albumsRepository.save({
+        id: album.id,
+        ...updatedAlbum,
+      });
     }
     return null;
   }
 
-  deleteAlbum(id: string): boolean {
-    const albumInd = albumDB.findIndex((album) => album.id === id);
-    if (albumInd >= 0) {
-      const { id: artistId } = albumDB[albumInd];
-      const artistInd = artistDB.findIndex((artist) => artist.id === artistId);
-      albumDB.splice(albumInd, 1);
-      artistDB.slice(artistInd, 1);
-      return true;
+  async deleteAlbum(id: string): Promise<boolean> {
+    const album = await this.albumsRepository.findOneBy({ id });
+    if (!album) return false;
+    const isAlbumDeleted = await !!this.albumsRepository
+      .createQueryBuilder()
+      .delete()
+      .where({ id })
+      .execute();
+    try {
+      this.artistsRepository
+        .createQueryBuilder()
+        .delete()
+        .where({ id: album.artistId })
+        .execute();
+    } catch (error) {
+      console.log(error);
     }
-    return false;
+    return isAlbumDeleted;
   }
 }
