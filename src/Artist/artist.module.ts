@@ -2,15 +2,15 @@ import { Module } from '@nestjs/common';
 import { ArtistController } from './artist.controller';
 import { ArtistService } from './artist.service';
 
-import { v4 as uuidv4 } from 'uuid';
 import { Artist, CreatorArtist } from './artist.interfaces';
-import { artistDB, trackDB } from '../db/mockedDB';
 import { Artists } from './artist.entity';
 import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Observable, from } from 'rxjs';
 import { Tracks } from 'src/Track/track.entity';
 import { Track } from 'src/Track/track.interfaces';
+import { Album } from 'src/Album/album.interface';
+import { Albums } from 'src/Album/album.entity';
 
 @Module({
   imports: [

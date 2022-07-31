@@ -13,6 +13,7 @@ import { TrackService } from './track.service';
 import { Response } from 'express';
 import { Error } from 'src/errors/ErrorHandler';
 import { Track } from './track.interfaces';
+import { Observable } from 'rxjs';
 
 @Controller('track')
 export class TrackController {
@@ -23,13 +24,16 @@ export class TrackController {
   }
 
   @Get()
-  getAllTracks() {
+  getAllTracks(): Observable<Track[]> {
     return this.trackService.getAllTracks();
   }
 
   @Get('/:id')
-  getTrackById(@Param() { id }, @Res() response: Response) {
-    const recivedTrackData = this.trackService.getTrackById(id);
+  async getTrackById(
+    @Param() { id },
+    @Res() response: Response,
+  ): Promise<Track | Response> {
+    const recivedTrackData = await this.trackService.getTrackById(id);
     if (this.checkTypeofError(recivedTrackData) && recivedTrackData?.code) {
       return response
         .status(recivedTrackData.code)
@@ -40,8 +44,11 @@ export class TrackController {
   }
 
   @Post()
-  createTrack(@Body() data: Track, @Res() response: Response) {
-    const recivedTrackData = this.trackService.createTrack(data);
+  async createTrack(
+    @Body() data: Track,
+    @Res() response: Response,
+  ): Promise<Track | Response> {
+    const recivedTrackData = await this.trackService.createTrack(data);
     if (this.checkTypeofError(recivedTrackData) && recivedTrackData?.code) {
       return response
         .status(recivedTrackData.code)
@@ -52,8 +59,12 @@ export class TrackController {
   }
 
   @Put('/:id')
-  updateTrack(@Param() { id }, @Body() data: Track, @Res() response: Response) {
-    const recivedTrackData = this.trackService.updateTrack(id, data);
+  async updateTrack(
+    @Param() { id },
+    @Body() data: Track,
+    @Res() response: Response,
+  ): Promise<Track | Response> {
+    const recivedTrackData = await this.trackService.updateTrack(id, data);
     if (this.checkTypeofError(recivedTrackData) && recivedTrackData?.code) {
       return response
         .status(recivedTrackData.code)
@@ -64,8 +75,11 @@ export class TrackController {
   }
 
   @Delete('/:id')
-  deleteTrackById(@Param() { id }, @Res() response: Response) {
-    const recivedTrackData = this.trackService.deleteTrack(id);
+  async deleteTrackById(
+    @Param() { id },
+    @Res() response: Response,
+  ): Promise<Response> {
+    const recivedTrackData = await this.trackService.deleteTrack(id);
     if (this.checkTypeofError(recivedTrackData) && recivedTrackData?.code) {
       return response
         .status(recivedTrackData.code)
