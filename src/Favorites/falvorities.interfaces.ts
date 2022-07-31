@@ -1,7 +1,7 @@
-import { Artist } from 'src/artist/artist.interfaces';
-import { Album } from 'src/album/album.interface';
-import { Track } from 'src/track/track.interfaces';
-export interface Favorites {
+import { Artist } from '../Artist/artist.interfaces';
+import { Album } from '../Album/album.interface';
+import { Track } from '../Track/track.interfaces';
+export interface FavoritesI {
   artists: string[];
   albums: string[];
   tracks: string[];

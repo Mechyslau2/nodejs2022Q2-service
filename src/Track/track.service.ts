@@ -1,34 +1,33 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { validate, version } from 'uuid';
 import { Track, TrackCreator } from './track.interfaces';
 import { TrackModule } from './track.module';
 
 import { Error, ErrorHandler } from 'src/errors/ErrorHandler';
+import { Observable } from 'rxjs';
 
 @Injectable()
 export class TrackService {
-  private trackModule: TrackModule;
-
-  constructor() {
-    this.trackModule = new TrackModule();
-  }
+  constructor(
+    @Inject(forwardRef(() => TrackModule)) private trackModule: TrackModule,
+  ) {}
 
   private checkId(id: string): boolean {
     return validate(id) && version(id) === 4;
   }
 
-  getAllTracks() {
+  getAllTracks(): Observable<Track[]> {
     return this.trackModule.getAllTracks();
   }
 
-  getTrackById(id: string): Track | Error {
+  async getTrackById(id: string): Promise<Track | Error> {
     if (!this.checkId(id)) {
       return new ErrorHandler({
         code: 400,
         message: "it ins't valid id",
       });
     }
-    const track = this.trackModule.getTrackById(id);
+    const track = await this.trackModule.getTrackById(id);
     if (!track) {
       return new ErrorHandler({
         code: 404,
@@ -38,18 +37,18 @@ export class TrackService {
     return track;
   }
 
-  createTrack(data: TrackCreator): Track | Error {
+  async createTrack(data: TrackCreator): Promise<Track | Error> {
     if (!Number(data?.duration) || !data?.name?.trim()) {
       return new ErrorHandler({
         code: 400,
         message: 'All fields are required',
       });
     }
-    const track = this.trackModule.createTrack(data);
+    const track = await this.trackModule.createTrack(data);
     return track;
   }
 
-  updateTrack(id: string, trackData: Track): Track | Error {
+  async updateTrack(id: string, trackData: Track): Promise<Track | Error> {
     if (
       typeof trackData?.name !== 'string' ||
       !trackData?.name?.trim() ||
@@ -66,7 +65,7 @@ export class TrackService {
         message: "It isn't valid id",
       });
     }
-    const track = this.trackModule.updateTrack(id, trackData);
+    const track = await this.trackModule.updateTrack(id, trackData);
     if (!track) {
       return new ErrorHandler({
         code: 404,
@@ -76,15 +75,15 @@ export class TrackService {
     return track;
   }
 
-  deleteTrack(id: string) {
+  async deleteTrack(id: string): Promise<void | Error> {
     if (!this.checkId(id)) {
       return new ErrorHandler({
         code: 400,
         message: "it ins't valid id",
       });
     }
-    const data = this.trackModule.deleteTrack(id);
-    if (!data) {
+    const isTrackDeleted = await this.trackModule.deleteTrack(id);
+    if (!isTrackDeleted) {
       return new ErrorHandler({
         code: 404,
         message: 'Track not found',

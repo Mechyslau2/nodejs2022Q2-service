@@ -13,6 +13,7 @@ import { AlbumService } from './album.service';
 import { Error } from 'src/errors/ErrorHandler';
 import { Response } from 'express';
 import { Album, AlbumCreator } from './album.interface';
+import { Observable } from 'rxjs';
 
 @Controller('album')
 export class AlbumController {
@@ -23,13 +24,16 @@ export class AlbumController {
   }
 
   @Get()
-  getAllAlbums() {
+  getAllAlbums(): Observable<Album[]> {
     return this.albumService.getAllAlbum();
   }
 
   @Get('/:id')
-  getAlbumById(@Param() { id }, @Res() response: Response) {
-    const album = this.albumService.getAlbumById(id);
+  async getAlbumById(
+    @Param() { id },
+    @Res() response: Response,
+  ): Promise<Album | Response> {
+    const album = await this.albumService.getAlbumById(id);
     if (this.checkTypeofError(album) && album?.code) {
       return response.status(album.code).send(album.message);
     } else {
@@ -38,8 +42,11 @@ export class AlbumController {
   }
 
   @Post()
-  createAlbum(@Body() albumData: AlbumCreator, @Res() response: Response) {
-    const album = this.albumService.createAlbum(albumData);
+  async createAlbum(
+    @Body() albumData: AlbumCreator,
+    @Res() response: Response,
+  ): Promise<Album | Response> {
+    const album = await this.albumService.createAlbum(albumData);
     if (this.checkTypeofError(album) && album?.code) {
       return response.status(album.code).send(album.message);
     } else {
@@ -48,12 +55,12 @@ export class AlbumController {
   }
 
   @Put('/:id')
-  updateAlbum(
+  async updateAlbum(
     @Param() { id },
     @Body() albumData: Album,
     @Res() response: Response,
-  ) {
-    const album = this.albumService.updateAlbum(id, albumData);
+  ): Promise<Album | Response> {
+    const album = await this.albumService.updateAlbum(id, albumData);
     if (this.checkTypeofError(album) && album?.code) {
       return response.status(album.code).send(album.message);
     } else {
@@ -62,8 +69,11 @@ export class AlbumController {
   }
 
   @Delete('/:id')
-  deleteAlbum(@Param() { id }, @Res() response: Response) {
-    const album = this.albumService.deleteAlbum(id);
+  async deleteAlbum(
+    @Param() { id },
+    @Res() response: Response,
+  ): Promise<void | Response> {
+    const album = await this.albumService.deleteAlbum(id);
     if (this.checkTypeofError(album) && album?.code) {
       return response.status(album.code).send(album.message);
     } else {
