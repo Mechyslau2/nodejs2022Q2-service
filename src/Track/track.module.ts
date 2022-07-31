@@ -1,8 +1,6 @@
 import { Module } from '@nestjs/common';
-import { albumDB, artistDB, trackDB } from 'src/db/mockedDB';
 import { TrackController } from './track.controller';
 import { Track, TrackCreator } from './track.interfaces';
-import { v4 as uuidv4 } from 'uuid';
 
 import { TrackService } from './track.service';
 import { Tracks } from './track.entity';

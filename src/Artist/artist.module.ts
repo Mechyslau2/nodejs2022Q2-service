@@ -9,8 +9,6 @@ import { Repository } from 'typeorm';
 import { Observable, from } from 'rxjs';
 import { Tracks } from 'src/Track/track.entity';
 import { Track } from 'src/Track/track.interfaces';
-import { Album } from 'src/Album/album.interface';
-import { Albums } from 'src/Album/album.entity';
 
 @Module({
   imports: [

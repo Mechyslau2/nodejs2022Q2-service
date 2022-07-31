@@ -8,6 +8,6 @@ export class Albums {
   name: string;
   @Column()
   year: number;
-  @Column()
+  @Column({ type: 'varchar', nullable: true })
   artistId: string | null;
 }

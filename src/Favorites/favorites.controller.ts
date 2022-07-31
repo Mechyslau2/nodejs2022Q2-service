@@ -3,6 +3,7 @@ import { FavoritesService } from './favorites.service';
 
 import { Error } from 'src/errors/ErrorHandler';
 import { Response } from 'express';
+import { FavoritesData } from './falvorities.interfaces';
 
 @Controller('favs')
 export class FavoritesController {
@@ -13,13 +14,16 @@ export class FavoritesController {
   }
 
   @Get()
-  getAllFavorites() {
-    return this.favoritesService.getAllFavorites();
+  async getAllFavorites(): Promise<any> {
+    return await this.favoritesService.getAllFavorites();
   }
 
   @Post('track/:id')
-  addTrack(@Param() { id }, @Res() response: Response) {
-    const track = this.favoritesService.addtrack(id);
+  async addTrack(
+    @Param() { id },
+    @Res() response: Response,
+  ): Promise<Response> {
+    const track = await this.favoritesService.addtrack(id);
     if (this.checkTypeofError(track) && track?.code) {
       return response.status(track.code).send(track.message);
     } else {
@@ -28,8 +32,11 @@ export class FavoritesController {
   }
 
   @Delete('track/:id')
-  deleteTrack(@Param() { id }, @Res() response: Response) {
-    const track = this.favoritesService.deleteTrack(id);
+  async deleteTrack(
+    @Param() { id },
+    @Res() response: Response,
+  ): Promise<Response> {
+    const track = await this.favoritesService.deleteTrack(id);
     if (this.checkTypeofError(track) && track?.code) {
       return response.status(track.code).send(track.message);
     } else {
@@ -38,8 +45,11 @@ export class FavoritesController {
   }
 
   @Post('album/:id')
-  addAlbum(@Param() { id }, @Res() response: Response) {
-    const album = this.favoritesService.addAlbum(id);
+  async addAlbum(
+    @Param() { id },
+    @Res() response: Response,
+  ): Promise<Response> {
+    const album = await this.favoritesService.addAlbum(id);
     if (this.checkTypeofError(album) && album?.code) {
       return response.status(album.code).send(album.message);
     } else {
@@ -48,8 +58,11 @@ export class FavoritesController {
   }
 
   @Delete('album/:id')
-  deleteAlbum(@Param() { id }, @Res() response: Response) {
-    const album = this.favoritesService.deleteAlbum(id);
+  async deleteAlbum(
+    @Param() { id },
+    @Res() response: Response,
+  ): Promise<Response> {
+    const album = await this.favoritesService.deleteAlbum(id);
     if (this.checkTypeofError(album) && album?.code) {
       return response.status(album.code).send(album.message);
     } else {
@@ -58,8 +71,11 @@ export class FavoritesController {
   }
 
   @Post('artist/:id')
-  addArtist(@Param() { id }, @Res() response: Response) {
-    const artist = this.favoritesService.addArtist(id);
+  async addArtist(
+    @Param() { id },
+    @Res() response: Response,
+  ): Promise<Response> {
+    const artist = await this.favoritesService.addArtist(id);
     if (this.checkTypeofError(artist) && artist?.code) {
       return response.status(artist.code).send(artist.message);
     } else {
@@ -68,8 +84,11 @@ export class FavoritesController {
   }
 
   @Delete('artist/:id')
-  deleteArtist(@Param() { id }, @Res() response: Response) {
-    const artist = this.favoritesService.deleteArtist(id);
+  async deleteArtist(
+    @Param() { id },
+    @Res() response: Response,
+  ): Promise<Response> {
+    const artist = await this.favoritesService.deleteArtist(id);
     if (this.checkTypeofError(artist) && artist?.code) {
       return response.status(artist.code).send(artist.message);
     } else {

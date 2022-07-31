@@ -6,10 +6,10 @@ export class Tracks {
   id: string;
   @Column()
   name: string;
-  @Column()
+  @Column({ type: 'varchar', nullable: true })
   artistId: string | null;
-  @Column()
+  @Column({ type: 'varchar', nullable: true })
   albumId: string | null;
-  @Column()
+  @Column({ type: 'varchar', nullable: true })
   duration: number;
 }

@@ -1,33 +1,33 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { validate, version } from 'uuid';
 import { FavoritesModule } from './favorites.module';
 
 import { Error, ErrorHandler } from 'src/errors/ErrorHandler';
+import { FavoritesData, FavoritesI } from './falvorities.interfaces';
 
 @Injectable()
 export class FavoritesService {
-  private favoritesModule: FavoritesModule;
-
-  constructor() {
-    this.favoritesModule = new FavoritesModule();
-  }
+  constructor(
+    @Inject(forwardRef(() => FavoritesModule))
+    private favoritesModule: FavoritesModule,
+  ) {}
 
   private checkId(id: string): boolean {
     return validate(id) && version(id) === 4;
   }
 
-  getAllFavorites() {
-    return this.favoritesModule.getAllFavorities();
+  async getAllFavorites(): Promise<FavoritesI> {
+    return await this.favoritesModule.getAllFavorities();
   }
 
-  addtrack(id: string): boolean | Error {
+  async addtrack(id: string): Promise<boolean | Error> {
     if (!this.checkId(id)) {
       return new ErrorHandler({
         code: 400,
         message: "it ins't valid id",
       });
     }
-    const isAddedTrack = this.favoritesModule.addFavoritiesTrack(id);
+    const isAddedTrack = await this.favoritesModule.addFavoritiesTrack(id);
     if (!isAddedTrack) {
       return new ErrorHandler({
         code: 422,
@@ -37,14 +37,14 @@ export class FavoritesService {
     return isAddedTrack;
   }
 
-  deleteTrack(id: string): boolean | Error {
+  async deleteTrack(id: string): Promise<boolean | Error> {
     if (!this.checkId(id)) {
       return new ErrorHandler({
         code: 400,
         message: "it ins't valid id",
       });
     }
-    const isDeletedTrack = this.favoritesModule.deleteFavoritesTrack(id);
+    const isDeletedTrack = await this.favoritesModule.deleteFavoritesTrack(id);
 
     if (!isDeletedTrack) {
       return new ErrorHandler({
@@ -55,14 +55,14 @@ export class FavoritesService {
     return isDeletedTrack;
   }
 
-  addAlbum(id: string): boolean | Error {
+  async addAlbum(id: string): Promise<boolean | Error> {
     if (!this.checkId(id)) {
       return new ErrorHandler({
         code: 400,
         message: "it ins't valid id",
       });
     }
-    const isAddedAlbum = this.favoritesModule.addAlbum(id);
+    const isAddedAlbum = await this.favoritesModule.addAlbum(id);
     if (!isAddedAlbum) {
       return new ErrorHandler({
         code: 422,
@@ -72,14 +72,14 @@ export class FavoritesService {
     return isAddedAlbum;
   }
 
-  deleteAlbum(id: string): boolean | Error {
+  async deleteAlbum(id: string): Promise<boolean | Error> {
     if (!this.checkId(id)) {
       return new ErrorHandler({
         code: 400,
         message: "it ins't valid id",
       });
     }
-    const isDeletedAlbum = this.favoritesModule.deleteFavoritesAlbum(id);
+    const isDeletedAlbum = await this.favoritesModule.deleteFavoritesAlbum(id);
     if (!isDeletedAlbum) {
       return new ErrorHandler({
         code: 404,
@@ -89,14 +89,14 @@ export class FavoritesService {
     return isDeletedAlbum;
   }
 
-  addArtist(id: string): boolean | Error {
+  async addArtist(id: string): Promise<boolean | Error> {
     if (!this.checkId(id)) {
       return new ErrorHandler({
         code: 400,
         message: "it ins't valid id",
       });
     }
-    const isAddedArtist = this.favoritesModule.addArtist(id);
+    const isAddedArtist = await this.favoritesModule.addArtist(id);
     if (!isAddedArtist) {
       return new ErrorHandler({
         code: 422,
@@ -106,14 +106,14 @@ export class FavoritesService {
     return isAddedArtist;
   }
 
-  deleteArtist(id: string): boolean | Error {
+  async deleteArtist(id: string): Promise<boolean | Error> {
     if (!this.checkId(id)) {
       return new ErrorHandler({
         code: 400,
         message: "it ins't valid id",
       });
     }
-    const isDeletedArtist = this.favoritesModule.deleteFavoritesArtist(id);
+    const isDeletedArtist = await this.favoritesModule.deleteFavoritesArtist(id);
     if (!isDeletedArtist) {
       return new ErrorHandler({
         code: 404,
